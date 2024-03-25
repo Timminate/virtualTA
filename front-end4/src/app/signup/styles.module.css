@@ -31,6 +31,7 @@
     margin-bottom: 5px;
   }
   
+  .login-form input[type="email"],
   .login-form input[type="username"],
   .login-form input[type="password"],
   .login-form button[type="submit"] {
