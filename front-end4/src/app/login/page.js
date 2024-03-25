@@ -4,14 +4,14 @@ import { useState } from 'react';
 import styles from './styles.module.css'; // Import the CSS module
 
 export default function Login() {
-  const [email, setEmail] = useState('');
+  const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
 
   const handleSubmit = (e) => {
     e.preventDefault();
     // For demonstration, we'll just display entered email and password
-    console.log('Email:', email);
+    console.log('Username:', username);
     console.log('Password:', password);
   };
 
@@ -21,11 +21,11 @@ export default function Login() {
         <h2>Login</h2>
         {error && <p className={styles.error}>{error}</p>}
         <div>
-          <label>Email:</label>
+          <label>Username:</label>
           <input
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
+            type="username"
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
             required
           />
         </div>
@@ -39,6 +39,11 @@ export default function Login() {
           />
         </div>
         <button type="submit">Login</button>
+        <div>
+          <p>Don't have an account?
+            <a href="/signup"> Sign up</a>
+          </p>
+        </div>
       </form>
     </div>
   );
