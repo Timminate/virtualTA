@@ -54,3 +54,12 @@
   font-size: 13px;
   text-align: center;
 }
+
+.next-page {
+  color: black;
+}
+
+.next-page:hover{
+  color: blue;
+  text-decoration: underline;
+}   
