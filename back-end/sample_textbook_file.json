@@ -1,0 +1,10 @@
+[
+    {
+        "text": "What is the capital of France?",
+        "in_response_to": "Paris"
+    },
+    {
+        "text": "Who wrote 'Hamlet'?",
+        "in_response_to": "William Shakespeare"
+    }
+]
