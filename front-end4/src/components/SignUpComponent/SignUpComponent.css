@@ -1,6 +1,5 @@
-/* pages/login.module.css */
-
 .login-container {
+    background-color: #b4d2e7;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -8,11 +7,12 @@
   }
   
   .login-form {
+    background-color: #f8f8f8;
     max-width: 400px;
     width: 100%;
-    padding: 20px;
+    padding: 50px 30px 50px 30px;
     border: 1px solid #ccc;
-    border-radius: 5px;
+    border-radius: 20px;
     box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
   }
   
@@ -31,6 +31,7 @@
     margin-bottom: 5px;
   }
   
+  .login-form input[type="email"],
   .login-form input[type="username"],
   .login-form input[type="password"],
   .login-form button[type="submit"] {
@@ -48,9 +49,17 @@
     border-radius: 3px;
     cursor: pointer;
   }
-
+  
   .login-form p { 
     font-size: 13px;
     text-align: center;
   }
-  
+
+  .next-page {
+    color: black;
+  }
+
+  .next-page:hover{
+    color: blue;
+    text-decoration: underline;
+  }   
