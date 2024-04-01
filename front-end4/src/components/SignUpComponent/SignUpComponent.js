@@ -45,7 +45,7 @@ export default function SignUpComponent() {
         <h2>Sign Up</h2>
         {error && <p className={styles.error}>{error}</p>}
         <div>
-          <label>Email:</label>
+          <label>Email</label>
           <input
             type="email"
             value={email}
@@ -54,7 +54,7 @@ export default function SignUpComponent() {
           />
         </div>
         <div>
-          <label>Username:</label>
+          <label>Username</label>
           <input
             type="username"
             value={username}
@@ -63,7 +63,7 @@ export default function SignUpComponent() {
           />
         </div>
         <div>
-          <label>Password:</label>
+          <label>Password</label>
           <input
             type="password"
             value={password}
@@ -72,7 +72,7 @@ export default function SignUpComponent() {
           />
         </div>
         <div>
-          <label>Confirm Password:</label>
+          <label>Confirm Password</label>
           <input
             type="password"
             value={check}
