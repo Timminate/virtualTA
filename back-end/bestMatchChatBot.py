@@ -8,7 +8,9 @@ from rake_nltk import Rake
 # Things to do:
 # - how to format textbook into json question-answer pairs (should question just be series of words related to answer?)
 #    - implement custom preprocessor to remove stopwords
+
 r = Rake()
+
 # r.extract_keywords_from_text(<text to process>)
 # To get keyword phrases ranked highest to lowest.
 # r.get_ranked_phrases()
@@ -66,10 +68,13 @@ print("1")
 corpus_trainer = ChatterBotCorpusTrainer(chatbot)
 corpus_trainer.train('chatterbot.corpus.english')
 corpus_trainer.train(
-    "./sample.json"
+    "./export.json"
     #"./data/greetings_corpus/custom.corpus.json",
     #"./data/my_corpus/"
 ) # TODO: add textbook json file 
+
+# Export training data
+# trainer.export_for_training('./my_export.json') # or './export.yml'
 
 print("2")
 
