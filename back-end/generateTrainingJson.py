@@ -8,6 +8,9 @@ from rake_nltk import Rake
 from sentence_transformers import SentenceTransformer
 from sklearn.metrics.pairwise import cosine_similarity
 
+# Tune as neeeded
+paragraph_similarity_threshold = 0.4 # used in merge_similar_paragraphs()
+
 def extract_keywords(text):
     rake = Rake()
     rake.extract_keywords_from_text(text)
@@ -23,14 +26,17 @@ def remove_latex_formatting(text):
     text = re.sub(r'{\\bf\s+(.*?)}\n', r'\1 ', text)
     text = re.sub(r'\\java{([^}]+)}', r'"\1"', text)
     
+    # Remove exercises
+    text = re.sub(r'\\section\{Exercise \d+\}.*?(?=\\chapter\{|\\section\{)', '', text, flags=re.DOTALL)
+    
     # Code blocks
     text = re.sub(r'\\begin{verbatim}(.*?)\\end{verbatim}\n\n', '', text, flags=re.DOTALL)
 
     # Bullet point lists
-    text = re.sub(r'\\item\s*', '- ', text)
+    text = re.sub(r'\\item\s*\n?\s*', '- ', text)
 
     # remove leading spaces
-    text = re.sub(r'^\s*', '', text, flags=re.MULTILINE)
+    text = re.sub(r'^[ \t]*', '', text, flags=re.MULTILINE)
     
     # Remove "\["
     text = re.sub(r'\s*\n+\\\[\s*(.*?)\s\\\]\n+', r' \1\]', text)
@@ -39,8 +45,8 @@ def remove_latex_formatting(text):
     text = re.sub(r'\\\]([a-z])', r', \1', text)
     
     # Combines broken-up text into one paragraph
-    text = re.sub(r'(?<=[^\.\?!}])\s?\n(?=[^\s\.\?!\\])', ' ', text)
-    
+    text = re.sub(r'(?<=[^\n}])\s?\n(?=[^-\n\\])', ' ', text)
+
     # remove $____$
     text = re.sub(r'\$([^$]+)\$', r'\1', text)
     
@@ -49,7 +55,7 @@ def remove_latex_formatting(text):
     
     # Fix double quote chars
     text = re.sub(r'``([^`\']+)\'\'', r'"\1"', text)
-    
+
     return text
 
 def organize_paragraphs(content):
@@ -63,15 +69,15 @@ def organize_paragraphs(content):
 
     for p in paragraphs:
         if p.strip():
-            # Merge paragraphs starting at \begin{enumerate}
+            # Merge paragraphs starting at \begin{itemize/enumerate}
             if merge_mode:
-                if p.strip().startswith('\\end{enumerate}'):
-                    merge_mode = False  # Reached \end{enumerate>
+                if p.strip().startswith('\\end{itemize}') or p.strip().startswith('\\end{enumerate}'):
+                    merge_mode = False  # Reached \end{itemize/enumerate}
                 else:
                     current_paragraph.append(p.strip()) 
             else:
-                if p.strip().startswith('\\begin{enumerate}'):
-                    merge_mode = True  # Reached \begin{enumerate}
+                if p.strip().startswith('\\begin{itemize}') or p.strip().startswith('\\begin{enumerate}'):
+                    merge_mode = True  # Reached \begin{itemize/enumerate}
                 else:
                     # Append current paragraph
                     if current_paragraph:
@@ -111,7 +117,7 @@ def merge_similar_paragraphs(paragraphs):
         
         current_group = [i]  # Start with current paragraph index
         for j in range(i + 1, len(paragraphs)):
-            if j not in grouped_indices and similarity_matrix[i][j] > 0.4:
+            if j not in grouped_indices and similarity_matrix[i][j] > paragraph_similarity_threshold:
                 current_group.append(j)  # Add similar paragraph indices
                 grouped_indices.add(j)  # Mark index as grouped
         
@@ -138,18 +144,18 @@ def extract_content(tex_file):
     
     for section_title, section_content in sections:
         paragraphs = organize_paragraphs(section_content)
-        # print("Num paragraphs:", len(paragraphs))
+        print("Num paragraphs:", len(paragraphs))
         # for i in range(len(paragraphs)):
         #     print(paragraphs[i])
         #     print("====")
         # print()
         
         similar_paragraphs = merge_similar_paragraphs(paragraphs)
-        # print("Num merged paragraphs:", len(similar_paragraphs))
+        print("Num merged paragraphs:", len(similar_paragraphs))
         # for i in range(len(similar_paragraphs)):
         #     print(similar_paragraphs[i])
         #     print("===============")
-        # print("------------------------------------") 
+        print("------------------------------------") 
         
         for p in similar_paragraphs:
             extracted_content.append([extract_keywords(p), p])
@@ -174,7 +180,7 @@ def export_for_training(extracted_content, file_path='./export.json'):
         json.dump(export, jsonfile, ensure_ascii=False)
 
 def main():
-    tex_file = 'ch2_SectionsOnly.tex' # Full textbook: 'book.tex'
+    tex_file = 'ch2.tex' # Full textbook: 'book.tex'
     export_file = './export.json'
     
     extracted_content = extract_content(tex_file)

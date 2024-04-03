@@ -1,6 +1,8 @@
 from chatterbot import ChatBot
 from chatterbot.trainers import ListTrainer
 from chatterbot.trainers import ChatterBotCorpusTrainer
+from chatterbot.comparisons import JaccardSimilarity
+
 # from chatterbot.preprocessors import StopWordsRemovalPreprocessor
 from rake_nltk import Rake
 
@@ -31,7 +33,7 @@ chatbot = ChatBot(
         'chatterbot.preprocessors.unescape_html',
         'chatterbot.preprocessors.convert_to_ascii'
     ],
-    #statement_comparison_function=chatterbot.comparisons.LevenshteinDistance,
+    statement_comparison_function=JaccardSimilarity,
     # ^^^ https://chatterbot.readthedocs.io/en/latest/comparisons.html
     # passed to BestMatch
     
@@ -66,7 +68,7 @@ print("1")
 
 # Corpus trainer ---------------
 corpus_trainer = ChatterBotCorpusTrainer(chatbot)
-corpus_trainer.train('chatterbot.corpus.english')
+# corpus_trainer.train('chatterbot.corpus.english')
 corpus_trainer.train(
     "./export.json"
     #"./data/greetings_corpus/custom.corpus.json",
