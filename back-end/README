@@ -1,0 +1,2 @@
+All training data are in training-jsons folder. 
+To train & run chatbot use "python bestMatchChatBot.py".
