@@ -36,14 +36,8 @@ def strip_latex_formatting(text):
     # Remove \newcommand
     text = re.sub(r'\\newcommand{(.*)}{(.*)}', '', text)
     
-    # Code blocks
-    text = re.sub(r'\\begin{verbatim}(.*?)\\end{verbatim}\n\n', '', text, flags=re.DOTALL)
-
     # Bullet point lists
     text = re.sub(r'\\item\s*\n?\s*', '- ', text)
-
-    # remove leading spaces
-    text = re.sub(r'^[ \t]*', '', text, flags=re.MULTILINE)
     
     # Remove "\["
     text = re.sub(r'\s*\n+\\\[\s*(.*?)\s\\\]\n+', r' \1\]', text)
@@ -51,9 +45,6 @@ def strip_latex_formatting(text):
     text = re.sub(r'\\\]([A-Z])', r'. \1', text)
     text = re.sub(r'\\\]([a-z])', r', \1', text)
     
-    # Combines broken-up text into one paragraph
-    text = re.sub(r'(?<=[^\n}])\s?\n(?=[^-\n\\])', ' ', text)
-
     # remove $____$
     text = re.sub(r'\$([^$]+)\$', r'\1', text)
     
@@ -83,12 +74,14 @@ def strip_latex_formatting(text):
     text = re.sub(r'\\log', 'log', text)
     text = re.sub(r'\\runtime', 'runtime', text)
     
+    text = re.sub(r'([A-Z]*[a-z])\n([A-Z]*[a-z])', r'\1 \2', text)
+    
     return text
 
 def organize_paragraphs(content):
     # Split into paragraphs by newline
     paragraphs = content.split('\n')
-
+        
     grouped_paragraphs = []
     current_paragraph = []
 
@@ -98,12 +91,12 @@ def organize_paragraphs(content):
         if p.strip():
             # Merge paragraphs starting at \begin{itemize/enumerate}
             if merge_mode:
-                if p.strip().startswith('\\end{itemize}') or p.strip().startswith('\\end{enumerate}'):
+                if p.strip().startswith(('\\end{itemize}', '\\end{enumerate}', '\\end{verbatim}')):
                     merge_mode = False  # Reached \end{itemize/enumerate}
                 else:
-                    current_paragraph.append(p.strip()) 
+                    current_paragraph.append(p.rstrip()) 
             else:
-                if p.strip().startswith('\\begin{itemize}') or p.strip().startswith('\\begin{enumerate}'):
+                if p.strip().startswith(('\\begin{itemize}', '\\begin{enumerate}', '\\begin{verbatim}')):
                     merge_mode = True  # Reached \begin{itemize/enumerate}
                 else:
                     # Append current paragraph
@@ -112,7 +105,7 @@ def organize_paragraphs(content):
                         current_paragraph = []
 
                     # Add the paragraph to the current paragraph
-                    current_paragraph.append(p.strip())
+                    current_paragraph.append(p.rstrip())
 
     # Append the last leftover paragraph, if exists
     if current_paragraph:
@@ -197,15 +190,14 @@ def extract_content(tex_file):
     sections = re.findall(section_regex, content, re.DOTALL)
 
     extracted_content = []
-    
     for section_title, section_content in sections:
         paragraphs = organize_paragraphs(section_content)
-        # print("Num paragraphs:", len(paragraphs))
+        print("Num paragraphs:", len(paragraphs))
         # for i in range(len(paragraphs)):
         #     print(paragraphs[i])
         #     print("====")
         # print()
-        
+                
         merged_paragraphs = merge_similar_paragraphs(paragraphs)
         print("Num merged paragraphs:", len(merged_paragraphs))
         # for i in range(len(merged_paragraphs)):
@@ -215,7 +207,7 @@ def extract_content(tex_file):
         
         # Method 1: RAKE =======================================================
         # for p in merged_paragraphs:
-            # extracted_content.append([extract_keywords(p), p])
+        #     extracted_content.append([extract_keywords(p), p])
 
         # Method 2: Grammar pattern =======================================================
         # for paragraph in merged_paragraphs:

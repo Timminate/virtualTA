@@ -49,7 +49,7 @@ corpus_trainer.train(
 while True:
     try:
         bot_input = chatbot.get_response(input("You: "))
-        print("Bot: ", bot_input)
+        print("Bot:", bot_input)
         print()
 
     except(KeyboardInterrupt, EOFError, SystemExit):

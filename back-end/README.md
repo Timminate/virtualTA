@@ -21,6 +21,6 @@ To train & run chatbot use "python bestMatchChatBot.py".
 
 ### Further work/improvements needed:
 - Improve statement_comparison_function to yield better matches: create custom function using similar logic from ChatterBot’s JaccardSimilarity
-- Stripping latex formatting still needs to be refined— for simplicity & time’s sake, code & tables have been excluded (will be processed in later development). Additionally, 
+- Stripping latex formatting still needs to be refined— for simplicity & time’s sake, code & tables have been excluded (will be processed in later development) 
 - Keyword extraction can still be improved/tweaked
-- Right now some of the chatbot responses are very long: ideally we can shorten/summarize them for the user
+- Currently some of the chatbot responses are very long: ideally we can shorten/summarize them to make them more concise responses
