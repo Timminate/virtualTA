@@ -1,58 +1,65 @@
-import React, { useState } from 'react';
-import PropTypes from 'prop-types';
+"use client";
+import Link from "next/link";
+import React, { useEffect } from "react";
+import {useRouter} from "next/navigation";
+import axios from "axios";
 import './LoginComponent.css'
 
 
-export default function LoginComponent(onSignUpClick ) {
-    const [username, setUsername] = useState('');
-    const [password, setPassword] = useState('');
+export default function LoginComponent(onSignup) {
+    const router = useRouter();
+    const [loading, setLoading] = React.useState(false);
+    const [user, setUser] = React.useState({
+        email: "",
+        password: "",
+    })
+    const onLogin = async () => {
+        try {
+            setLoading(true);
+            const response = await axios.post("/api/users/login", user);
+            console.log("Login success!")
+            router.push("/");
+            
+        } catch (error) {
+            console.log("Login failed", error.message);
+            
+        }finally {
+            setLoading(false);
+        }
+    }
 
-    const submit = (e) => {
-        e.preventDefault();
-        console.log('Username: ', username);
-        console.log('Password: ', password);
-        
-        /*
-        *
-        * Insert Code for Authentication Here (when user hits submit)
-        * 
-        */
-
-    };
     
     return (
         <div className='login-container'>
-            <form className="login-form" onSubmit={submit}>
+            <form className="login-form">
                 <h2>Log In</h2>
-                <label>Username</label>
+                <label>Username/Email</label>
                 <input
-                    type="username"
-                    text="text"
-                    value={username}
-                    onChange={(e) => setUsername(e.target.value)}
+                    id="username"
+                    type="text"
+                    value={user.username || user.email}
+                    onChange={(e) => setUser({...user, email: e.target.value})}
+                    placeholder="Enter your username or email address."
                     required
                 />
     
                 <label>Password</label>
                 <input
+                    id="password"
                     type="password"
-                    text="text"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
+                    value={user.password}
+                    onChange={(e) => setUser({...user, password: e.target.value})}
+                    placeholder="Enter your password"
                     required
                 />
     
-                <button type="submit">Log In</button>
+                <button onClick={onLogin} type="submit">Log In</button>
     
                 <p>
-                Don't have an account?&nbsp;<a className="next-page" href="/signup" onClick={onSignUpClick}>Sign Up</a>
+                Don't have an account?&nbsp;<a className="next-page" href="/signup">Sign Up</a>
                 </p>
     
             </form>
         </div>
     );
-    
-    Login.propTypes = {
-        onSignUpClick: PropTypes.func.isRequired,
-    };
 }
