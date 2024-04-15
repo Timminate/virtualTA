@@ -36,7 +36,7 @@ export default function LoginComponent(onSignup) {
                 <label>Username/Email</label>
                 <input
                     id="username"
-                    type="text"
+                    type="username"
                     value={user.username || user.email}
                     onChange={(e) => setUser({...user, email: e.target.value})}
                     placeholder="Enter your username or email address."

@@ -30,7 +30,7 @@ export default function SignupPage() {
           <label>Email</label>
           <input 
             id="email"
-            type="text"
+            type="email"
             value={user.email}
             onChange={(e) => setUser({...user, email: e.target.value})}
             placeholder="email"
@@ -41,7 +41,7 @@ export default function SignupPage() {
           <label>Username</label>
           <input
             id="username"
-            type="text"
+            type="username"
             value={user.username}
             onChange={(e) => setUser({...user, username: e.target.value})}
             placeholder="username"
