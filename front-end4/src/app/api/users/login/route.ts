@@ -11,8 +11,8 @@ export async function POST(request: NextRequest){
         const {email, password} = reqBody
 
         const user = await User.findOne({email})
-
         if(!user){
+            console.log("invalid user")
             return NextResponse.json({error: "User does not exist"}, {status: 400})
         }
         
@@ -20,6 +20,7 @@ export async function POST(request: NextRequest){
         const validPassword = await bcryptjs.compare
         (password, user.password)
         if(!validPassword){
+            console.log("invalid password")
             return NextResponse.json({error: "Invlid password"}, {status: 400})
         }
 
@@ -30,14 +31,15 @@ export async function POST(request: NextRequest){
         }
 
         // Create a token with expiration of 1 day
+
         const token = await jwt.sign(tokenData, process.env.TOKEN_SECRET!, {expiresIn: "1d"})
 
+        
         // Create a JSON response indicating successful login
         const response = NextResponse.json({
             message: "Login successful",
             success: true,
         })
-
 
         response.cookies.set("token", token, {
             httpOnly: true,

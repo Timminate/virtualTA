@@ -13,8 +13,9 @@ export default function SignupPage() {
       username: "",
   })
 
-  const onSignup = async () => {
+  const onSignup = async (e) => {
     try {
+      e.preventDefault()
       const response = await axios.post("/api/users/signup", user)
       router.push("/login")
     } catch (error) {
