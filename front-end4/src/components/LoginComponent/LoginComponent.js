@@ -13,12 +13,14 @@ export default function LoginComponent(onSignup) {
         email: "",
         password: "",
     })
-    const onLogin = async () => {
+
+    const onLogin = async (e) => {
+        e.preventDefault()
         try {
             setLoading(true);
             const response = await axios.post("/api/users/login", user);
             console.log("Login success!")
-            router.push("/");
+            router.push("/chatbot");
             
         } catch (error) {
             console.log("Login failed", error.message);
@@ -36,7 +38,7 @@ export default function LoginComponent(onSignup) {
                 <label>Username/Email</label>
                 <input
                     id="username"
-                    type="text"
+                    type="username"
                     value={user.username || user.email}
                     onChange={(e) => setUser({...user, email: e.target.value})}
                     placeholder="Enter your username or email address."
