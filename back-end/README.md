@@ -4,6 +4,7 @@ To train & run chatbot use "python bestMatchChatBot.py".
 
 ## Backend documentation
 
+
 ### Generate training files (`generateTrainingJson.py`)
 1. Parse through textbook latex source, stripping it of the latex formatting
 2. For each section of the textbook (1.1, 1.2, etc), parse into paragraphs and merge any consecutive paragraphs that are talking about the same topic into one chunk of text (these related paragraphs are identified based on a calculated similarity score that must reach our specified similarity threshold).
@@ -18,6 +19,10 @@ To train & run chatbot use "python bestMatchChatBot.py".
 - Use BestMatch logic adapter to select the best response
   - Can specify a similarity threshold
 - Specify statement_comparison_function to calculate similarity between user input & keywords that will be passed to BestMatch logic adapter
+May need to run:
+- python -m spacy download en_core_web_lg
+- pip3 install "spacy>=2.1,<2.2"
+
 
 ### Further work/improvements needed:
 - Improve statement_comparison_function to yield better matches: create custom function using similar logic from ChatterBot’s JaccardSimilarity

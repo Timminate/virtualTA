@@ -22,9 +22,11 @@ paragraph_similarity_threshold = 0.4 # used in merge_similar_paragraphs()
 def strip_latex_formatting(text):
     text = re.sub(r'\\label{[^}]+}\n', '', text)
     text = re.sub(r'\\index{[^}]+}\n+', '', text)
+    text = re.sub(r'{\\tt ([^}]+)}', r'\1', text)
     text = re.sub(r'\\url{([^}]+)}', r'\1', text)
     text = re.sub(r'{\\bf\s+(.*?)}\n', r'\1 ', text)
     text = re.sub(r'\\java{([^}]+)}', r'"\1"', text)
+    text = re.sub(r'% .*', '', text)
     
     # Remove exercises
     text = re.sub(r'\\section\{Exercise \d+\}.*?(?=\\chapter\{|\\section\{)', '', text, flags=re.DOTALL)
@@ -74,7 +76,12 @@ def strip_latex_formatting(text):
     text = re.sub(r'\\log', 'log', text)
     text = re.sub(r'\\runtime', 'runtime', text)
     
-    text = re.sub(r'([A-Z]*[a-z])\n([A-Z]*[a-z])', r'\1 \2', text)
+    # Replace quotes
+    text = re.sub(r'\\begin{quote}\n', '"', text)
+    text = re.sub(r'\n\\end{quote}', '"', text)
+    
+    # Combine split-up paragraphs
+    text = re.sub(r'([\w",.()*?-]+)[ ]*\n[ ]*([\w",.()*-]+)', r'\1 \2', text)
     
     return text
 
@@ -86,26 +93,38 @@ def organize_paragraphs(content):
     current_paragraph = []
 
     merge_mode = False
-
+    
+    unfinished_paragraph = False
+    partial_paragraph = ""
+    
     for p in paragraphs:
         if p.strip():
-            # Merge paragraphs starting at \begin{itemize/enumerate}
+            # Merge paragraphs starting at \begin{itemize/enumerate/verbatim}
             if merge_mode:
                 if p.strip().startswith(('\\end{itemize}', '\\end{enumerate}', '\\end{verbatim}')):
-                    merge_mode = False  # Reached \end{itemize/enumerate}
+                    merge_mode = False  # Reached \end{itemize/enumerate/verbatim}
                 else:
                     current_paragraph.append(p.rstrip()) 
             else:
                 if p.strip().startswith(('\\begin{itemize}', '\\begin{enumerate}', '\\begin{verbatim}')):
-                    merge_mode = True  # Reached \begin{itemize/enumerate}
+                    merge_mode = True  # Reached \begin{itemize/enumerate/verbatim}
                 else:
+                    # check if is unfinished paragraph (ending with ;)
+                    if p[-1] == ';':
+                        unfinished_paragraph = True
+                    
+                    if unfinished_paragraph:
+                        partial_paragraph += p.strip()
+                        if p[-1] != ';':
+                            unfinished_paragraph = False
+                    else:
+                        current_paragraph.append(p.rstrip())
+                    
                     # Append current paragraph
-                    if current_paragraph:
+                    if current_paragraph and not unfinished_paragraph:
                         grouped_paragraphs.append('\n'.join(current_paragraph))
                         current_paragraph = []
 
-                    # Add the paragraph to the current paragraph
-                    current_paragraph.append(p.rstrip())
 
     # Append the last leftover paragraph, if exists
     if current_paragraph:
@@ -124,27 +143,22 @@ def merge_similar_paragraphs(paragraphs):
     embeddings = model.encode(paragraphs)
     similarity_matrix = cosine_similarity(embeddings)
     
-    # Grouped paragraphs
-    grouped_indices = set()
+    # merged pagraphs
+    merged_paragraphs = []
 
-    # Store all merged pagraphs
-    grouped_paragraphs = []
-
-    for i in range(len(paragraphs)):
-        # Skip paragraph if grouped already
-        if i in grouped_indices:
-            continue  
-        
-        current_group = [i]  # Start with current paragraph index
+    i = 0
+    while i < len(paragraphs):
+        # Find all mergable paragraphs
+        end_index = i
         for j in range(i + 1, len(paragraphs)):
-            if j not in grouped_indices and similarity_matrix[i][j] > paragraph_similarity_threshold:
-                current_group.append(j)  # Add similar paragraph indices
-                grouped_indices.add(j)  # Mark index as grouped
-        
-        # Add as a merged paragraph
-        grouped_paragraphs.append('\n'.join([paragraphs[idx] for idx in current_group]))
+            if similarity_matrix[i][j] > paragraph_similarity_threshold:
+                end_index = j
+            
+        # Merge paragraphs
+        merged_paragraphs.append('\n'.join(paragraphs[i:end_index+1]))
+        i = end_index+1
 
-    return grouped_paragraphs
+    return merged_paragraphs
 
 # Used for RAKE: this extracts top phrases from each chunk of text
 def extract_keywords(text):
@@ -175,51 +189,47 @@ def extract_noun_phrases(text):
         noun_phrases.append(' '.join(word for word, pos in subtree.leaves()))
     return noun_phrases
 
+# Remove punctuation from keywords
+def remove_punctuation(keywords):
+    keywords = keywords.replace(';', '').replace('** ', '').replace(' **', '').replace('"', '').replace('!', '').replace('http :// thinkdast', ' ').replace('.', ' ').replace('):', ' ').replace('*/', ' ')
+    keywords = re.sub(' +', ' ', keywords)
+    return keywords
+
 def extract_content(tex_file):
     with open(tex_file, 'r') as file:
         content = file.read()
     
-    # with open("./before.txt", 'w+', encoding='utf8') as txtfile:
-    #     txtfile.write(content)
+    # Convert LaTeX formatting to text
     content = strip_latex_formatting(content)
-    # with open("./after.txt", 'w+', encoding='utf8') as txtfile:
-    #     txtfile.write(content)
         
     # Find sections using regex
     section_regex = r'\\section{([^}]+)}\n(.*?)(?=\\chapter|\\section|\Z)'
     sections = re.findall(section_regex, content, re.DOTALL)
 
+    # txtfile1 = open("./after1.txt", 'w+', encoding='utf8')
+    # txtfile2 = open("./after2.txt", 'w+', encoding='utf8')
     extracted_content = []
     for section_title, section_content in sections:
         paragraphs = organize_paragraphs(section_content)
-        print("Num paragraphs:", len(paragraphs))
-        # for i in range(len(paragraphs)):
-        #     print(paragraphs[i])
-        #     print("====")
-        # print()
-                
-        merged_paragraphs = merge_similar_paragraphs(paragraphs)
-        print("Num merged paragraphs:", len(merged_paragraphs))
-        # for i in range(len(merged_paragraphs)):
-        #     print(merged_paragraphs[i])
-        #     print("===============")
-        print("------------------------------------") 
-        
-        # Method 1: RAKE =======================================================
-        # for p in merged_paragraphs:
-        #     extracted_content.append([extract_keywords(p), p])
 
-        # Method 2: Grammar pattern =======================================================
-        # for paragraph in merged_paragraphs:
-        #     # Extract noun phrases from the paragraph
-        #     noun_phrases = extract_noun_phrases(paragraph)
-        #     # Get top 5 frequent noun phrases as keywords
-        #     keywords = ", ".join(noun_phrases[:5])  # Adjust as needed
-            
-        #     if keywords is not "":
-        #         extracted_content.append([keywords, paragraph])
+        # Merge broken up paragraphs
+        i = len(paragraphs)-2
+        while i >= 0:
+            if paragraphs[i][-1] is ":" or not (paragraphs[i][-1] is "." or paragraphs[i][-1] is "?" or paragraphs[i][-1] is "!"):
+                paragraphs[i:i+2] = ['\n'.join(paragraphs[i:i+2])]
+            i -= 1
+    
+        # print("Num paragraphs:", len(paragraphs))
+        # print()
         
-        # Method 3: LDA =======================================================
+        # txtfile1.write('\n-------------------\n'.join(paragraphs))
+          
+        merged_paragraphs = merge_similar_paragraphs(paragraphs)
+        # print("Num merged paragraphs:", len(merged_paragraphs))
+        # print("------------------------------------") 
+        
+        # txtfile2.write('\n-------------------\n'.join(merged_paragraphs))
+        
         from gensim import corpora, models
 
         # Tokenize each paragraph into a list of words & create dictionary and corpus
@@ -230,7 +240,22 @@ def extract_content(tex_file):
         # Train LDA model
         lda_model = models.LdaModel(corpus, num_topics=7, id2word=dictionary)
 
-        for paragraph, tokenized_paragraph in zip(merged_paragraphs, tokenized_paragraphs):
+        for p, tokenized_paragraph in zip(merged_paragraphs, tokenized_paragraphs):
+            combined_keywords = []
+            
+            # =============== Method 1: RAKE ==============================
+            combined_keywords.append(remove_punctuation(extract_keywords(p)))
+            
+            # =============== Method 2: Grammar pattern ==================
+            # Extract noun phrases from the paragraph
+            noun_phrases = extract_noun_phrases(p)
+            # Get top 5 frequent noun phrases as keywords
+            keywords = ", ".join(noun_phrases[:5])  # Adjust as needed
+            
+            if keywords is not "":
+                combined_keywords.append(remove_punctuation(keywords))
+                
+            # =============== Method 3: LDA ==============================
             # Get bag-of-words representation
             bow = dictionary.doc2bow(tokenized_paragraph)
             # Get topic distribution of paragraph
@@ -249,19 +274,12 @@ def extract_content(tex_file):
             
             topic_keywords = list(set(topic_keywords)) # Remove duplicates
             keywords = ", ".join(topic_keywords)
-            extracted_content.append([keywords, paragraph])
+            combined_keywords.append(remove_punctuation(keywords))
+            
+            # =============== Creating keyword-corpus pairs ===============
+            extracted_content.append([', '.join(combined_keywords), p])
  
-    # print()
-    # print()
     return extracted_content
-
-# Based off of ChatterBot trainers.py: _generate_export_data()
-def generate_export_data(extracted_content):
-    result = []
-    for section in extracted_content:
-        result.append([section["in_response_to"], section["text"]])
-
-    return result
 
 # Based off of ChatterBot trainers.py: export_for_training()
 def export_for_training(extracted_content, file_path='./export.json'):
