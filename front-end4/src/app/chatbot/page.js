@@ -17,13 +17,14 @@ import {
 
 export default function ChatBot() {
 
-  const handleLogout = () => {
-    /*
-    *
-    * Insert logic for logging user out
-    * 
-    */
-    // temp testing log
+  const handleLogout = async () => {
+    try {
+      await axios.get('/api/users/logout');
+      router.push('/login')
+    } catch (error) {
+        console.log(error.message)
+        
+    }
     console.log('User logged out');
   };
 
