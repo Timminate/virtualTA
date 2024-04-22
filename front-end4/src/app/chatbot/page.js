@@ -4,6 +4,8 @@ import Container from 'react-bootstrap/Container';
 import Navbar from 'react-bootstrap/Navbar';
 import Nav from 'react-bootstrap/Nav';
 import 'bootstrap/dist/css/bootstrap.min.css';
+import {useRouter} from "next/navigation";
+import axios from 'axios';
 import {
   MDBContainer,
   MDBRow,
@@ -16,6 +18,7 @@ import {
 } from 'mdb-react-ui-kit';
 
 export default function ChatBot() {
+  const router = useRouter();
 
   const handleLogout = async () => {
     try {
@@ -25,7 +28,6 @@ export default function ChatBot() {
         console.log(error.message)
         
     }
-    console.log('User logged out');
   };
 
   return (
