@@ -6,6 +6,7 @@ import Nav from 'react-bootstrap/Nav';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import {useRouter} from "next/navigation";
 import axios from 'axios';
+import { useState } from 'react';
 import {
   MDBContainer,
   MDBRow,
@@ -19,6 +20,11 @@ import {
 
 export default function ChatBot() {
   const router = useRouter();
+  const [name, setName] = useState("");
+  const handleSubmit = (event) => {
+    event.preventDefault();
+    alert(name)
+  }
 
   const handleLogout = async () => {
     try {
@@ -59,7 +65,7 @@ export default function ChatBot() {
                 }}
               >
                 <MDBIcon fas icon="angle-left" />
-                <p className="mb-0 fw-bold">Live chat</p>
+                <p className="mb-0 fw-bold">Virtual TA</p>
                 <MDBIcon fas icon="times" />
               </MDBCardHeader>
 
@@ -136,13 +142,19 @@ export default function ChatBot() {
                     <p className="small mb-0">...</p>
                   </div>
                 </div>
-
+                
+                <form onSubmit={handleSubmit}>
+                  <div>Chat with the Bot</div>
+                  <input type= "text" value={name} onChange={(e) => setName(e.target.value)} />
+                  <input type= "submit" data-mdb-button-init data-mdb-ripple-init class="btn btn-primary btn-block mb-4"/>
+                </form>
                 <MDBTextArea
                   className="form-outline"
                   label="Type your message"
                   id="textAreaExample"
                   rows={4}
                 />
+                
               </MDBCardBody>
             </MDBCard>
           </MDBCol>
