@@ -1,0 +1,161 @@
+\section{Selection sort}
+\label{selection-sort}
+
+\index{selection sort}
+\index{sorting}
+
+For example, here's an implementation of a simple algorithm called
+{\bf selection sort}
+(see \url{http://thinkdast.com/selectsort}):
+
+\begin{verbatim}
+public class SelectionSort {
+
+    /**
+     * Swaps the elements at indexes i and j.
+     */
+    public static void swapElements(int[] array, int i, int j) {
+        int temp = array[i];
+        array[i] = array[j];
+        array[j] = temp;
+    }
+
+    /**
+     * Finds the index of the lowest value
+     * starting from the index at start (inclusive)
+     * and going to the end of the array.
+     */
+    public static int indexLowest(int[] array, int start) {
+        int lowIndex = start;
+        for (int i = start; i < array.length; i++) {
+            if (array[i] < array[lowIndex]) {
+                lowIndex = i;
+            }
+        }
+        return lowIndex;
+    }
+
+    /**
+     * Sorts the elements (in place) using selection sort.
+     */
+    public static void selectionSort(int[] array) {
+        for (int i = 0; i < array.length; i++) {
+            int j = indexLowest(array, i);
+            swapElements(array, i, j);
+        }
+    }
+}
+\end{verbatim}
+
+The first method, \java{swapElements}, swaps two elements of the
+array. Reading and writing elements are constant time operations,
+because if we know the size of the elements and the location of
+the first, we can compute the location of any other element
+with one multiplication and one addition, and
+those are constant time operations. Since everything in
+\java{swapElements} is constant time, the whole method is constant
+time.
+
+\index{constant time}
+
+The second method, \java{indexLowest}, finds the index of the smallest
+element of the array starting at a given index, \java{start}. Each
+time through the loop, it accesses two elements of the array and
+performs one comparison. Since these are all constant time operations,
+it doesn't really matter which ones we count. To keep it simple, let's
+count the number of comparisons.
+
+\begin{enumerate}
+
+\item If \java{start} is 0, \java{indexLowest} traverses the entire
+  array, and the total number of comparisons is the length of
+  the array, which I'll call $n$.
+
+\item If \java{start} is 1, the number of comparisons is $n-1$.
+
+\item In general, the number of comparisons is $n$ - \java{start}, so 
+  \java{indexLowest} is linear.
+
+\end{enumerate}
+
+The third method, \java{selectionSort}, sorts the array. It loops from
+0 to $n-1$, so the loop executes $n$ times. Each
+time, it calls \java{indexLowest} and then performs a constant time
+operation, \java{swapElements}.
+
+\index{linear time}
+
+The first time \java{indexLowest} is called, it
+performs $n$ comparisons. The second time, it performs
+$n-1$ comparisons, and so on. The total number of comparisons is
+
+\[ n + n-1 + n-2 + ... + 1 + 0 \]
+
+The sum of this series is $n(n+1)/2$, which is
+proportional to $n^2$; and that means that \java{selectionSort}
+is quadratic.
+
+\index{quadratic time}
+
+To get to the same result a different way, we can think of
+\java{indexLowest} as a nested loop. Each time we call
+\java{indexLowest}, the number of operations is proportional
+to $n$. We call it $n$ times, so the total number of
+operations is proportional to $n^2$.
+
+
+\section{Big O notation}
+\label{big-o-notation}
+
+\index{big O notation}
+
+All constant time algorithms belong to a set called $O(1)$. So another way
+to say that an algorithm is constant time is to say that it is in $O(1)$.
+Similarly, all linear algorithms belong to $O(n)$, and all quadratic
+algorithms belong to $O(n^2)$. This way of classifying algorithms is called
+``big O notation''.
+
+NOTE: I am providing a casual definition of big O notation. For a more
+mathematical treatment, see
+\url{http://thinkdast.com/bigo}.
+
+This notation provides a convenient way to write general rules about how
+algorithms behave when we compose them. For example, if you perform a
+linear time algorithm followed by a constant algorithm, the total run
+time is linear. Using $\in$ to mean ``is a member of'':
+
+If $f \in O(n)$ and $g \in O(1)$, $f+g \in O(n)$.
+
+If you perform two linear operations, the total is still linear:
+
+If $f \in O(n)$ and $g \in O(n)$, $f+g \in O(n)$.
+
+In fact, if you perform a linear operation any number of times,
+$k$, the total is linear, as long as $k$ is a constant
+that does not depend on $n$.
+
+If $f \in O(n)$ and $k$ is a constant, $kf \in O(n)$.
+
+But if you perform a linear operation $n$ times, the result is
+quadratic:
+
+If $f \in O(n)$, $nf \in O(n^2)$.
+
+In general, we only care about the largest exponent of $n$. So if
+the total number of operations is $2n + 1$, it belongs to
+$O(n)$. The leading constant, 2, and the additive term, 1, are
+not important for this kind of analysis. Similarly, $n^2 + 100n + 1000$ is
+in $O(n^2)$.  Don't be distracted by the big numbers!
+
+``Order of growth'' is another name for the same idea.  An order of
+growth is a set of algorithms whose runtimes are in the same big O
+category; for example, all linear algorithms belong to the same order
+of growth because their runtimes are in $O(n)$.
+
+\index{order of growth}
+
+In this context, an ``order'' is a group, like the \emph{Order of
+the Knights of the Round Table}, which is a group of knights, not a way
+of lining them up. So you can imagine the \emph{Order of Linear
+Algorithms} as a set of brave, chivalrous, and particularly efficient
+algorithms.

@@ -1,0 +1,453 @@
+\chapter{Analysis of Algorithms}
+\label{cs-analysis-of-algorithms-readme}
+
+As we saw in the previous chapter, Java provides two
+implementations of the \java{List} interface, \java{ArrayList} and
+\java{LinkedList}. For some applications \java{LinkedList} is faster;
+for other applications \java{ArrayList} is faster.
+
+\index{analysis of algorithms}
+\index{profiling}
+
+To decide which one is better for a particular application, one approach
+is to try them both and see how long they take. This approach, which is
+called ``profiling'', has a few problems:
+
+\begin{enumerate}
+
+\item Before you can compare the algorithms, you have to implement
+  them both.
+
+\item The results might depend on what kind of computer you use. One
+  algorithm might be better on one machine; the other might be better on
+  a different machine.
+
+\item The results might depend on the size of the problem or the data
+  provided as input.
+
+\end{enumerate}
+
+We can address some of these problems using {\bf analysis of
+  algorithms}. When it works, algorithm analysis makes it possible to
+compare algorithms without having to implement them. But we have to
+make some assumptions:
+
+\begin{enumerate}
+
+\item To avoid dealing with the details of computer hardware, we
+  usually identify the basic operations that make up an algorithm ---
+  like addition, multiplication, and comparison of numbers --- and
+  count the number of operations each algorithm requires.
+
+\item To avoid dealing with the details of the input data, the best
+  option is to analyze the average performance for the inputs we
+  expect. If that's not possible, a common alternative is to analyze
+  the worst case scenario.
+
+\item Finally, we have to deal with the possibility that one algorithm
+  works best for small problems and another for big ones. In that
+  case, we usually focus on the big ones, because for small problems
+  the difference probably doesn't matter, but for big problems the
+  difference can be huge.
+
+\end{enumerate}
+
+This kind of analysis lends itself to simple classification of
+algorithms. For example, if we know that the runtime of Algorithm A
+tends to be proportional to the size of the input, $n$, and Algorithm
+B tends to be proportional to $n^2$, we expect A to be faster than B,
+at least for large values of $n$.
+
+\index{constant time}
+\index{linear time}
+\index{quadratic time}
+
+Most simple algorithms fall into just a few categories.
+
+\begin{itemize}
+
+\item Constant time: An algorithm is ``constant time'' if the runtime
+  does not depend on the size of the input. For example, if you have
+  an array of $n$ elements and you use the bracket operator
+  (\java{[]}) to access one of the elements, this operation takes
+  the same number of operations regardless of how big the array
+  is.
+
+\item Linear: An algorithm is ``linear'' if the runtime is
+  proportional to the size of the input. For example, if you add up the
+  elements of an array, you have to access $n$ elements and
+  perform $n-1$ additions. The total number of operations
+  (element accesses and additions) is $2n-1$, which is
+  proportional to $n$.
+
+\item Quadratic: An algorithm is ``quadratic'' if the runtime is
+  proportional to $n^2$.  For example, suppose you want to check whether
+  any element in a list appears more than once.  A simple algorithm
+  is to compare each element to all of the others.  If there are
+  $n$ elements and each is compared to $n-1$ others, the total
+  number of comparisons is $n^2 -n$, which is proportional to
+  $n^2$ as $n$ grows.
+
+\end{itemize}
+
+
+\section{Selection sort}
+\label{selection-sort}
+
+\index{selection sort}
+\index{sorting}
+
+For example, here's an implementation of a simple algorithm called
+{\bf selection sort}
+(see \url{http://thinkdast.com/selectsort}):
+
+\begin{verbatim}
+public class SelectionSort {
+
+    /**
+     * Swaps the elements at indexes i and j.
+     */
+    public static void swapElements(int[] array, int i, int j) {
+        int temp = array[i];
+        array[i] = array[j];
+        array[j] = temp;
+    }
+
+    /**
+     * Finds the index of the lowest value
+     * starting from the index at start (inclusive)
+     * and going to the end of the array.
+     */
+    public static int indexLowest(int[] array, int start) {
+        int lowIndex = start;
+        for (int i = start; i < array.length; i++) {
+            if (array[i] < array[lowIndex]) {
+                lowIndex = i;
+            }
+        }
+        return lowIndex;
+    }
+
+    /**
+     * Sorts the elements (in place) using selection sort.
+     */
+    public static void selectionSort(int[] array) {
+        for (int i = 0; i < array.length; i++) {
+            int j = indexLowest(array, i);
+            swapElements(array, i, j);
+        }
+    }
+}
+\end{verbatim}
+
+The first method, \java{swapElements}, swaps two elements of the
+array. Reading and writing elements are constant time operations,
+because if we know the size of the elements and the location of
+the first, we can compute the location of any other element
+with one multiplication and one addition, and
+those are constant time operations. Since everything in
+\java{swapElements} is constant time, the whole method is constant
+time.
+
+\index{constant time}
+
+The second method, \java{indexLowest}, finds the index of the smallest
+element of the array starting at a given index, \java{start}. Each
+time through the loop, it accesses two elements of the array and
+performs one comparison. Since these are all constant time operations,
+it doesn't really matter which ones we count. To keep it simple, let's
+count the number of comparisons.
+
+\begin{enumerate}
+
+\item 
+  If \java{start} is 0, \java{indexLowest} traverses the entire
+  array, and the total number of comparisons is the length of
+  the array, which I'll call $n$.
+
+\item 
+If \java{start} is 1, the number of comparisons is $n-1$.
+
+\item 
+In general, the number of comparisons is $n$ - \java{start}, so 
+  \java{indexLowest} is linear.
+
+\end{enumerate}
+
+The third method, \java{selectionSort}, sorts the array. It loops from
+0 to $n-1$, so the loop executes $n$ times. Each
+time, it calls \java{indexLowest} and then performs a constant time
+operation, \java{swapElements}.
+
+\index{linear time}
+
+The first time \java{indexLowest} is called, it
+performs $n$ comparisons. The second time, it performs
+$n-1$ comparisons, and so on. The total number of comparisons is
+
+\[ n + n-1 + n-2 + ... + 1 + 0 \]
+
+The sum of this series is $n(n+1)/2$, which is
+proportional to $n^2$; and that means that \java{selectionSort}
+is quadratic.
+
+\index{quadratic time}
+
+To get to the same result a different way, we can think of
+\java{indexLowest} as a nested loop. Each time we call
+\java{indexLowest}, the number of operations is proportional
+to $n$. We call it $n$ times, so the total number of
+operations is proportional to $n^2$.
+
+
+\section{Big O notation}
+\label{big-o-notation}
+
+\index{big O notation}
+
+All constant time algorithms belong to a set called $O(1)$. So another way
+to say that an algorithm is constant time is to say that it is in $O(1)$.
+Similarly, all linear algorithms belong to $O(n)$, and all quadratic
+algorithms belong to $O(n^2)$. This way of classifying algorithms is called
+``big O notation''.
+
+NOTE: I am providing a casual definition of big O notation. For a more
+mathematical treatment, see
+\url{http://thinkdast.com/bigo}.
+
+This notation provides a convenient way to write general rules about how
+algorithms behave when we compose them. For example, if you perform a
+linear time algorithm followed by a constant algorithm, the total run
+time is linear. Using $\in$ to mean ``is a member of'':
+
+If $f \in O(n)$ and $g \in O(1)$, $f+g \in O(n)$.
+
+If you perform two linear operations, the total is still linear:
+
+If $f \in O(n)$ and $g \in O(n)$, $f+g \in O(n)$.
+
+In fact, if you perform a linear operation any number of times,
+$k$, the total is linear, as long as $k$ is a constant
+that does not depend on $n$.
+
+If $f \in O(n)$ and $k$ is a constant, $kf \in O(n)$.
+
+But if you perform a linear operation $n$ times, the result is
+quadratic:
+
+If $f \in O(n)$, $nf \in O(n^2)$.
+
+In general, we only care about the largest exponent of $n$. So if
+the total number of operations is $2n + 1$, it belongs to
+$O(n)$. The leading constant, 2, and the additive term, 1, are
+not important for this kind of analysis. Similarly, $n^2 + 100n + 1000$ is
+in $O(n^2)$.  Don't be distracted by the big numbers!
+
+``Order of growth'' is another name for the same idea.  An order of
+growth is a set of algorithms whose runtimes are in the same big O
+category; for example, all linear algorithms belong to the same order
+of growth because their runtimes are in $O(n)$.
+
+\index{order of growth}
+
+In this context, an ``order'' is a group, like the \emph{Order of
+the Knights of the Round Table}, which is a group of knights, not a way
+of lining them up. So you can imagine the \emph{Order of Linear
+Algorithms} as a set of brave, chivalrous, and particularly efficient
+algorithms.
+
+
+\section{Exercise 2}
+\label{exercise2}
+
+The exercise for this chapter is to implement a \java{List} that
+uses a Java array to store the elements. 
+
+In the code repository for this book (see Section~\ref{code}),
+you'll find the source files you'll need:
+
+\index{MyArrayList}
+
+\begin{itemize}
+\item \java{MyArrayList.java} contains a partial implementation of the
+ \java{List} interface.  Four of the methods are incomplete; your job
+ is to fill them in.
+
+\item \java{MyArrayListTest.java} contains JUnit tests you can use to
+check your work.
+
+\end{itemize}
+
+You'll also find the Ant build file \java{build.xml}.  From the {\tt
+  code} directory, you should be able to run \java{ant MyArrayList} to
+run \java{MyArrayList.java}, which contains a few simple tests. Or you
+can run \java{ant MyArrayListTest} to run the JUnit test.
+
+\index{Ant}
+%TODO: either make the build step automatic or add instructions
+
+When you run the tests, several of them should fail. If you examine the
+source code, you'll find four \java{TODO} comments indicating the
+methods you should fill in.
+
+Before you start filling in the missing methods, let's walk through
+some of the code. Here are the class definition, instance variables,
+and constructor.
+
+\index{instance variable}
+\index{constructor}
+
+
+\begin{verbatim}
+public class MyArrayList<E> implements List<E> {
+    int size;                    // keeps track of the number of elements
+    private E[] array;           // stores the elements
+    
+    public MyArrayList() {
+        array = (E[]) new Object[10];
+        size = 0;
+    }
+}
+\end{verbatim}
+
+As the comments indicate, \java{size} keeps track of how many elements
+are in \java{MyArrayList}, and \java{array} is the array that
+actually contains the elements.
+
+\index{element}
+
+The constructor creates an array of 10 elements, which are initially
+\java{null}, and sets \java{size} to 0. Most of the time, the length
+of the array is bigger than \java{size}, so there are unused slots in
+the array.
+
+\index{type parameter}
+
+One detail about Java: you can't instantiate an array using a type
+parameter; for example, the following will not work:
+
+\begin{verbatim}
+        array = new E[10];
+\end{verbatim}
+
+To work around this limitation, you have to instantiate an array of
+\java{Object} and then typecast it. You can read more about this issue
+at \url{http://thinkdast.com/generics}.
+
+Next we'll look at the method that adds elements to the list:
+
+\begin{verbatim}
+    public boolean add(E element) {
+        if (size >= array.length) {
+            // make a bigger array and copy over the elements
+            E[] bigger = (E[]) new Object[array.length * 2];
+            System.arraycopy(array, 0, bigger, 0, array.length);
+            array = bigger;
+        } 
+        array[size] = element;
+        size++;
+        return true;
+    }
+\end{verbatim}
+
+If there are no unused spaces in the array, we have to create a bigger
+array and copy over the elements. Then we can store the element in the
+array and increment \java{size}.
+
+\index{boolean}
+
+It might not be obvious why this method returns a boolean, since it
+seems like it always returns \java{true}. As always, you can find the
+answer in the documentation:
+\url{http://thinkdast.com/colladd}.
+It's also not obvious how to analyze the performance of this
+method. In the normal case, it's constant time, but if we have to
+resize the array, it's linear. I'll explain how to handle this in
+Section~\ref{classifying-add}.
+
+\index{constant time}
+\index{linear time}
+
+Finally, let's look at \java{get}; then you can get started on the
+exercises.
+
+\begin{verbatim}
+    public T get(int index) {
+        if (index < 0 || index >= size) {
+            throw new IndexOutOfBoundsException();
+        }
+        return array[index];
+    }
+\end{verbatim}
+
+Actually, \java{get} is pretty simple:
+if the index is out of bounds, it throws an exception; otherwise it
+reads and returns an element of the array. Notice that it checks whether
+the index is less than \java{size}, not \java{array.length}, so it's
+not possible to access the unused elements of the array.
+
+\index{get}
+
+In \java{MyArrayList.java}, you'll find a stub for \java{set} that
+looks like this:
+
+\begin{verbatim}
+    public T set(int index, T element) {
+        // TODO: fill in this method.
+        return null;
+    }
+\end{verbatim}
+
+Read the documentation of \java{set} at
+\url{http://thinkdast.com/listset}, then fill in the body of this
+method. If you run \java{MyArrayListTest} again, \java{testSet} should
+pass.
+
+\index{set}
+
+HINT: Try to avoid repeating the index-checking code.
+
+Your next mission is to fill in \java{indexOf}. As usual, you should
+read the documentation at \url{http://thinkdast.com/listindof} so you
+know what it's supposed to do. In particular, notice how it is
+supposed to handle \java{null}.
+
+\index{indexOf}
+\index{helper method}
+
+I've provided a helper method called
+\java{equals} that compares an element from the array to a target
+value and returns \java{true} if they are equal (and it handles
+\java{null} correctly). Notice that this method is private because it
+is only used inside this class; it is not part of the \java{List}
+interface.
+
+\index{equals}
+
+When you are done, run \java{MyArrayListTest} again;
+\java{testIndexOf} should pass now, as well as the other tests that
+depend on it.
+
+Only two more methods to go, and you'll be done with this
+exercise. The next one is an overloaded version of \java{add} that
+takes an index and stores the new value at the given index, shifting
+the other elements to make room, if necessary.
+
+\index{add}
+
+Again, read the documentation at \url{http://thinkdast.com/listadd},
+write an implementation, and run the tests for confirmation.
+
+HINT: Avoid repeating the code that makes the array bigger.
+
+Last one: fill in the body of \java{remove}.  The documentation is at
+\url{http://thinkdast.com/listrem}. When you finish this one, all
+tests should pass.
+
+\index{remove}
+
+Once you have your implementation working, compare it to mine, which
+you can read at \url{http://thinkdast.com/myarraylist}.
+
+
+\chapter{ArrayList}
