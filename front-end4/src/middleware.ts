@@ -6,7 +6,7 @@ export function middleware(request: NextRequest) {
 
   // Define paths that are considered public (accessible without a token)
   // Profile page is temp public for testing purposes
-  const isPublicPath = path === '/' || path === '/signup' || path === '/verifyemail' || path === '/profile'
+  const isPublicPath = path === '/' || path === '/signup' || path === '/verifyemail'
 
   const token = request.cookies.get('token')?.value || ''
 
