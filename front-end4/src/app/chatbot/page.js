@@ -21,6 +21,8 @@ import {
 export default function ChatBot() {
   const router = useRouter();
   const [name, setName] = useState("");
+
+  
   const handleSubmit = (event) => {
     event.preventDefault();
     alert(name)
@@ -148,13 +150,6 @@ export default function ChatBot() {
                   <input type= "text" value={name} onChange={(e) => setName(e.target.value)} />
                   <input type= "submit" data-mdb-button-init data-mdb-ripple-init class="btn btn-primary btn-block mb-4"/>
                 </form>
-                <MDBTextArea
-                  className="form-outline"
-                  label="Type your message"
-                  id="textAreaExample"
-                  rows={4}
-                />
-                
               </MDBCardBody>
             </MDBCard>
           </MDBCol>
