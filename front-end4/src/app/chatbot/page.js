@@ -21,6 +21,8 @@ import {
 export default function ChatBot() {
   const router = useRouter();
   const [name, setName] = useState("");
+
+
   const handleSubmit = (event) => {
     event.preventDefault();
     alert(name)
@@ -55,7 +57,7 @@ export default function ChatBot() {
       </Navbar>
       <MDBContainer className="py-5">
         <MDBRow className="d-flex justify-content-center">
-          <MDBCol md="8" lg="6" xl="4">
+          <MDBCol md="16" lg="12" xl="8">
             <MDBCard id="chat1" style={{ borderRadius: '15px' }}>
               <MDBCardHeader
                 className="d-flex justify-content-between align-items-center p-3 bg-info text-white border-bottom-0"
@@ -84,8 +86,7 @@ export default function ChatBot() {
                     }}
                   >
                     <p className="small mb-0">
-                      Hello and thank you for visiting MDBootstrap. Please click
-                      the video below.
+                      What is hashing and hashmap? 
                     </p>
                   </div>
                 </div>
@@ -96,7 +97,13 @@ export default function ChatBot() {
                     style={{ borderRadius: '15px', backgroundColor: '#fbfbfb' }}
                   >
                     <p className="small mb-0">
-                      Thank you, I really like your product.
+                      At this point you should be familiar with the "Map" interface and the "HashMap" implementation provided by Java. And by making your own "Map" using a hash table, you should understand how "HashMap" works and why we expect its core methods to be constant time. Because of this performance, "HashMap" is widely used, but it is not the only implementation of "Map". There are a few reasons you might want another implementation: Hashing can be slow, so even though "HashMap" operations are constant time, the "constant" might be big.
+                      Hashing works well if the hash function distributes the keys evenly among the sub-maps. But designing good hash functions is not easy, and if too many keys end up in the same sub-map, the performance of the "HashMap" may be poor.
+                      The keys in a hash table are not stored in any particular order; in fact, the order might change when the table grows and the keys are rehashed. For some applications, it is necessary, or at least useful, to keep the keys in order.
+                      It is hard to solve all of these problems at the same time, but Java provides an implementation called "TreeMap" that comes close: 
+                      It doesn't use a hash function, so it avoids the cost of hashing and the difficulty of choosing a hash function. - Inside the "TreeMap", the keys are are stored in a binary search tree, which makes it possible to traverse the keys, in order, in linear time.
+                      The runtime of the core methods is proportional to log n, which is not quite as good as constant time, but it is still very good.
+                      In the next section, I'll explain how binary search trees work and then you will use one to implement a "Map". Along the way, we'll analyze the performance of the core map methods when implemented using a tree.  
                     </p>
                   </div>
                   <img
@@ -114,10 +121,10 @@ export default function ChatBot() {
                   />
                   <div className="ms-3" style={{ borderRadius: '15px' }}>
                     <div className="bg-image">
-                      <img
+                      <img /*
                         src="https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/screenshot1.webp"
                         style={{ borderRadius: '15px' }}
-                        alt="video"
+                        alt="video" */
                       />
                       <a href="#!">
                         <div className="mask"></div>
@@ -127,10 +134,10 @@ export default function ChatBot() {
                 </div>
 
                 <div className="d-flex flex-row justify-content-start mb-4">
-                  <img
+                  <img 
                     src="https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava1-bg.webp"
                     alt="avatar 1"
-                    style={{ width: '45px', height: '100%' }}
+                    style={{ width: '45px', height: '100%' }} 
                   />
                   <div
                     className="p-3 ms-3"
@@ -139,22 +146,15 @@ export default function ChatBot() {
                       backgroundColor: 'rgba(57, 192, 237,.2)',
                     }}
                   >
-                    <p className="small mb-0">...</p>
+                    <p className="small mb-0">Thank you!</p>
                   </div>
                 </div>
                 
                 <form onSubmit={handleSubmit}>
                   <div>Chat with the Bot</div>
-                  <input type= "text" value={name} onChange={(e) => setName(e.target.value)} />
+                  <input type= "text" value={name} onChange={(e) => setName(e.target.value)} size="80"/>
                   <input type= "submit" data-mdb-button-init data-mdb-ripple-init class="btn btn-primary btn-block mb-4"/>
                 </form>
-                <MDBTextArea
-                  className="form-outline"
-                  label="Type your message"
-                  id="textAreaExample"
-                  rows={4}
-                />
-                
               </MDBCardBody>
             </MDBCard>
           </MDBCol>
