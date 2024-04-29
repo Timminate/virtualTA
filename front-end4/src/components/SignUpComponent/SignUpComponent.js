@@ -34,7 +34,29 @@ export default function SignupPage() {
             type="email"
             value={user.email}
             onChange={(e) => setUser({...user, email: e.target.value})}
-            placeholder="email"
+            placeholder="Email"
+            required
+            />
+        </div>
+        <div>
+          <label>First Name</label>
+          <input 
+            id="firstName"
+            type="firstName"
+            value={user.firstName}
+            onChange={(e) => setUser({...user, firstName: e.target.value})}
+            placeholder="First Name"
+            required
+            />
+        </div>
+        <div>
+          <label>Last Name</label>
+          <input 
+            id="lastName"
+            type="lastName"
+            value={user.lastName}
+            onChange={(e) => setUser({...user, lastName: e.target.value})}
+            placeholder="Last Name"
             required
             />
         </div>
@@ -45,7 +67,7 @@ export default function SignupPage() {
             type="username"
             value={user.username}
             onChange={(e) => setUser({...user, username: e.target.value})}
-            placeholder="username"
+            placeholder="Username"
             required
           />
         </div>
@@ -56,7 +78,7 @@ export default function SignupPage() {
             type="password"
             value={user.password}
             onChange={(e) => setUser({...user, password: e.target.value})}
-            placeholder="password"
+            placeholder="Password"
             required
             />
         </div>

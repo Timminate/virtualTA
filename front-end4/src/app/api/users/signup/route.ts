@@ -3,16 +3,14 @@ import User from "@/models/userModel";
 import { NextRequest, NextResponse } from "next/server";
 import bcryptjs from "bcryptjs";
 
-
 connect()
 // Calls the connect function to establish a connection to the database.
-
 
 export async function POST(request: NextRequest){
 // Defines an asynchronous POST request handler.
     try {
         const reqBody = await request.json()
-        const {username, email, password} = reqBody
+        const {username, email, password, firstName, lastName} = reqBody
 
         const user = await User.findOne({email})
 
@@ -26,7 +24,9 @@ export async function POST(request: NextRequest){
         const newUser = new User({
             username,
             email,
-            password: hashedPassword
+            password: hashedPassword,
+            firstName,
+            lastName
         })
 
         const savedUser = await newUser.save()

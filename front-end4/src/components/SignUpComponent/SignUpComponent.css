@@ -34,6 +34,8 @@
   .login-form input[type="email"],
   .login-form input[type="username"],
   .login-form input[type="password"],
+  .login-form input[type="firstName"],
+  .login-form input[type="lastName"],
   .login-form button[type="submit"] {
     width: 100%;
     padding: 10px;

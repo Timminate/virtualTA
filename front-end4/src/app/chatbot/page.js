@@ -153,7 +153,7 @@ export default function ChatBot() {
                 <form onSubmit={handleSubmit}>
                   <div>Chat with the Bot</div>
                   <input type= "text" value={name} onChange={(e) => setName(e.target.value)} size="80"/>
-                  <input type= "submit" data-mdb-button-init data-mdb-ripple-init class="btn btn-primary btn-block mb-4"/>
+                  <input type= "submit" data-mdb-button-init data-mdb-ripple-init className="btn btn-primary btn-block mb-4"/>
                 </form>
               </MDBCardBody>
             </MDBCard>
